@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id              Int               @id @default(autoincrement())
+  name            String            @db.VarChar(255)
+  description     String?           @db.Text
+  price           Float
+  stock           Int
+  warehouseId     Int               @unique
+  image           String?           @db.Text
+  createdAt       DateTime          @default(now())
+  category        Category?         @relation("ProductCategory", fields: [categoryId], references: [id])
+  categoryId      Int               @unique
+  warehouse       Warehouse         @relation(fields: [warehouseId], references: [id])
+  deletedAt       DateTime?
+  TransactionItem TransactionItem[]
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(255)
+  product   Product?  @relation("ProductCategory")
+  deletedAt DateTime?
+}
+
+model Transaction {
+  id        Int               @id @default(autoincrement())
+  type      TransactionType
+  deletedAt DateTime?
+  createdAt DateTime          @default(now())
+  items     TransactionItem[]
+}
+
+enum TransactionType {
+  INCOMING
+  OUTCOMING
+}
+
+
+
+model TransactionItem {
+  transactionId Int
+  productId     Int
+  quantity      Int
+  price         Int
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  product       Product     @relation(fields: [productId], references: [id])
+  createdAt     DateTime    @default(now())
+
+  @@id([productId, transactionId])
+}
+
+model Warehouse {
+  id        Int       @id @default(autoincrement())
+  name      String    @db.VarChar(255)
+  address   String    @db.Text
+  phone     String    @db.VarChar(15)
+  createdAt DateTime  @default(now())
+  Products  Product[]
+  deletedAt DateTime?
+}
