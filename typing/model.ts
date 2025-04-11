@@ -82,4 +82,5 @@ export type TransactionRequest = {
 export type ApiResponse<T> = {
   data: T;
   message: string | null;
+  total: number | null
 };

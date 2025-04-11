@@ -25,6 +25,8 @@ app.get<string, null, ApiResponse<Product[]>>("/product", async (_, res) => {
   try {
     const products =
       (await prisma.product.findMany({
+        take: 10,
+        skip: 3,
         where: {
           deletedAt: null,
         },
@@ -33,11 +35,13 @@ app.get<string, null, ApiResponse<Product[]>>("/product", async (_, res) => {
           warehouse: true,
         },
       })) || [];
-
-    res.status(200).json({ data: products, message: "success" });
+    const total = await prisma.category.count();
+    res.status(200).json({ data: products, message: "success", total });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ data: [], message: "Error Get Products" });
+    res
+      .status(500)
+      .json({ data: [], message: "Error Get Products", total: null });
   }
 });
 
@@ -56,28 +60,33 @@ app.get<string, { id: string }, ApiResponse<Product | null>>(
             warehouse: true,
           },
         })) || [];
-
-      res.status(200).json({ data: product, message: "success" });
+      const total = await prisma.product.count();
+      res.status(200).json({ data: product, message: "success", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Get Product" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Get Product", total: null });
     }
   }
 );
 
 app.post<string, null, ApiResponse<null>, ProductRequest>(
-  "/product",
+  "/product/create",
   async (req, res) => {
     try {
       await prisma.product.create({
         data: req.body,
       });
+      const total = await prisma.product.count();
       res
         .status(201)
-        .json({ data: null, message: "Product created successfully" });
+        .json({ data: null, message: "Product created successfully", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Create Product" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Create Product", total: null });
     }
   }
 );
@@ -92,10 +101,13 @@ app.put<string, { id: string }, ApiResponse<null>, ProductRequest>(
           id: parseInt(req.params.id),
         },
       });
-      res.status(200).json({ data: null, message: "success" });
+      const total = await prisma.product.count();
+      res.status(200).json({ data: null, message: "success", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Get Product" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Get Product", total: null });
     }
   }
 );
@@ -111,12 +123,15 @@ app.delete<string, { id: string }, ApiResponse<null>>(
         },
       });
       console.log("product soft deleted successfully");
+      const total = await prisma.product.count();
       res
         .status(204)
-        .json({ data: null, message: "Product deleted successfully" });
+        .json({ data: null, message: "Product deleted successfully", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Delete Product" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Delete Product", total: null });
     }
   }
 );
@@ -132,25 +147,34 @@ app.get<string, null, ApiResponse<Category[]>>("/category", async (_, res) => {
         where: {
           deletedAt: null,
         },
+        orderBy: {
+          id: "asc",
+        },
       })) || [];
-    res.status(200).json({ data: categories, message: null });
+    const total = await prisma.category.count();
+    res.status(200).json({ data: categories, message: null, total });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ data: [], message: "Error Get Categories" });
+    res
+      .status(500)
+      .json({ data: [], message: "Error Get Categories", total: null });
   }
 });
 
 app.post<string, null, ApiResponse<null>, CategoryRequest>(
-  "/category",
+  "/category/create",
   async (req, res) => {
     try {
       await prisma.category.create({
         data: req.body,
       });
-      res.status(201).json({ data: null, message: "Success Created" });
+      const total = await prisma.category.count();
+      res.status(201).json({ data: null, message: "Success Created", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Create Category" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Create Category", total: null });
     }
   }
 );
@@ -175,7 +199,7 @@ app.delete<string, { id: string }, ApiResponse<null>>(
 );
 
 app.put<string, { id: string }, ApiResponse<null>, CategoryRequest>(
-  "/category/:id",
+  "/category/update/:id",
   async (req, res) => {
     try {
       await prisma.category.update({
@@ -183,10 +207,13 @@ app.put<string, { id: string }, ApiResponse<null>, CategoryRequest>(
         data: req.body,
       });
       console.log("category soft deleted");
-      res.status(200).json({ data: null, message: "Success Update" });
+      const total = await prisma.category.count();
+      res.status(200).json({ data: null, message: "Success Update", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Update Category" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Update Category", total: null });
     }
   }
 );
@@ -204,25 +231,31 @@ app.get<string, null, ApiResponse<Warehouse[]>>(
             deletedAt: null,
           },
         })) || [];
-      res.status(200).json({ data: warehouse, message: "success" });
+      const total = await prisma.warehouse.count();
+      res.status(200).json({ data: warehouse, message: "success", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: [], message: "Error Get Warehouses" });
+      res
+        .status(500)
+        .json({ data: [], message: "Error Get Warehouses", total: null });
     }
   }
 );
 
 app.post<string, null, ApiResponse<null>, WarehouseRequest>(
-  "/warehouse",
+  "/warehouse/create",
   async (req, res) => {
     try {
       await prisma.warehouse.create({
         data: req.body,
       });
-      res.status(201).json({ data: null, message: "Success Created" });
+      const total = await prisma.warehouse.count();
+      res.status(201).json({ data: null, message: "Success Created", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Create Warehouse" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Create Warehouse", total: null });
     }
   }
 );
@@ -239,10 +272,15 @@ app.delete<string, { id: string }, ApiResponse<null>, WarehouseRequest>(
           deletedAt: new Date(),
         },
       });
-      res.status(200).json({ data: null, message: "Category is Soft Delete" });
+      const total = await prisma.warehouse.count();
+      res
+        .status(200)
+        .json({ data: null, message: "Category is Soft Delete", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Delete Warehouse" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Delete Warehouse", total: null });
     }
   }
 );
@@ -255,10 +293,13 @@ app.put<string, { id: string }, ApiResponse<null>>(
         where: { id: parseInt(req.params.id) },
         data: req.body,
       });
-      res.status(200).json({ data: null, message: "Success Update" });
+      const total = await prisma.warehouse.count();
+      res.status(200).json({ data: null, message: "Success Update", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Update Warehouse" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Update Warehouse", total: null });
     }
   }
 );
@@ -274,10 +315,13 @@ app.get<string, null, ApiResponse<Transaction[]>>(
           deletedAt: null,
         },
       });
-      res.status(200).json({ data: transactions, message: "success" });
+      const total = await prisma.transaction.count();
+      res.status(200).json({ data: transactions, message: "success", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: [], message: "Error Get Transactions" });
+      res
+        .status(500)
+        .json({ data: [], message: "Error Get Transactions", total: null });
     }
   }
 );
@@ -304,16 +348,19 @@ app.get<string, { id: string }, ApiResponse<TransactionWithItems | null>>(
           },
         },
       });
-      res.status(200).json({ data: transaction, message: "success" });
+      const total = await prisma.transaction.count();
+      res.status(200).json({ data: transaction, message: "success", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Get Transactions" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Get Transactions", total: null });
     }
   }
 );
 
 app.post<string, null, ApiResponse<null>, TransactionRequest>(
-  "/transaction",
+  "/transaction/create",
   async (req, res) => {
     try {
       await prisma.transaction.create({
@@ -329,26 +376,13 @@ app.post<string, null, ApiResponse<null>, TransactionRequest>(
 
       console.log(req.body.items);
       console.log(req.body.type);
-
-      // const transaction = await prisma.transaction.create({
-      //   data: {
-      //     type: req.body.type,
-      //   },
-      // });
-
-      // await prisma.transactionItem.createMany({
-      //   data: req.body.items.map((item) => ({
-      //     transactionId: transaction.id,
-      //     productId: item.productId,
-      //     price: item.price,
-      //     quantity: item.quantity,
-      //   })),
-      // });
-
-      res.status(201).json({ data: null, message: "Success Created" });
+      const total = await prisma.transaction.count();
+      res.status(201).json({ data: null, message: "Success Created", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Create Transaction" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Create Transaction", total: null });
     }
   }
 );
@@ -394,11 +428,13 @@ app.put<string, { id: string }, ApiResponse<null>, TransactionRequest>(
           quantity: item.quantity,
         })),
       });
-
-      res.status(200).json({ data: null, message: "Success Update" });
+      const total = await prisma.transaction.count();
+      res.status(200).json({ data: null, message: "Success Update", total });
     } catch (error) {
       console.error(error);
-      res.status(500).json({ data: null, message: "Error Update Transaction" });
+      res
+        .status(500)
+        .json({ data: null, message: "Error Update Transaction", total: null });
     }
   }
 );

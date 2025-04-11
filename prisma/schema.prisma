@@ -9,7 +9,7 @@ datasource db {
 
 model Product {
   id              Int               @id @default(autoincrement())
-  name            String            @db.VarChar(255)
+  name            String            @unique @db.VarChar(255)
   description     String?           @db.Text
   price           Float
   stock           Int
@@ -42,8 +42,6 @@ enum TransactionType {
   INCOMING
   OUTCOMING
 }
-
-
 
 model TransactionItem {
   transactionId Int
