@@ -11,7 +11,7 @@ import {
   Transaction,
   TransactionWithItems,
   TransactionRequest,
-} from "../typing/model";
+} from "../typing/type";
 
 const app = express();
 const prisma = new PrismaClient();
@@ -21,12 +21,15 @@ app.use(express.json());
 dotenv.config();
 
 // CRUD product
-app.get<string, null, ApiResponse<Product[]>>("/product", async (_, res) => {
+app.get<string, null, ApiResponse<Product[]>>("/product", async (req, res) => {
   try {
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
     const products =
       (await prisma.product.findMany({
-        take: 10,
-        skip: 3,
+        skip,
+        take: limit,
         where: {
           deletedAt: null,
         },
@@ -35,8 +38,9 @@ app.get<string, null, ApiResponse<Product[]>>("/product", async (_, res) => {
           warehouse: true,
         },
       })) || [];
-    const total = await prisma.category.count();
+    const total = await prisma.product.count();
     res.status(200).json({ data: products, message: "success", total });
+    console.log("success get all products");
   } catch (error) {
     console.error(error);
     res
@@ -148,16 +152,18 @@ app.get<string, null, ApiResponse<Category[]>>("/category", async (_, res) => {
           deletedAt: null,
         },
         orderBy: {
-          id: "asc",
+          id: "desc",
         },
       })) || [];
     const total = await prisma.category.count();
     res.status(200).json({ data: categories, message: null, total });
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ data: [], message: "Error Get Categories", total: null });
+    res.status(500).json({
+      data: [],
+      message: "Error Get Categories",
+      total: null,
+    });
   }
 });
 
@@ -232,6 +238,7 @@ app.get<string, null, ApiResponse<Warehouse[]>>(
           },
         })) || [];
       const total = await prisma.warehouse.count();
+
       res.status(200).json({ data: warehouse, message: "success", total });
     } catch (error) {
       console.error(error);
@@ -275,7 +282,7 @@ app.delete<string, { id: string }, ApiResponse<null>, WarehouseRequest>(
       const total = await prisma.warehouse.count();
       res
         .status(200)
-        .json({ data: null, message: "Category is Soft Delete", total });
+        .json({ data: null, message: "warehouse is Soft Delete", total });
     } catch (error) {
       console.error(error);
       res
@@ -286,7 +293,7 @@ app.delete<string, { id: string }, ApiResponse<null>, WarehouseRequest>(
 );
 
 app.put<string, { id: string }, ApiResponse<null>>(
-  "/warehouse/:id",
+  "/warehouse/update/:id",
   async (req, res) => {
     try {
       await prisma.warehouse.update({

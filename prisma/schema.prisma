@@ -9,15 +9,15 @@ datasource db {
 
 model Product {
   id              Int               @id @default(autoincrement())
-  name            String            @unique @db.VarChar(255)
+  name            String            @db.VarChar(255)
   description     String?           @db.Text
   price           Float
   stock           Int
-  warehouseId     Int               @unique
+  warehouseId     Int
   image           String?           @db.Text
   createdAt       DateTime          @default(now())
-  category        Category?         @relation("ProductCategory", fields: [categoryId], references: [id])
-  categoryId      Int               @unique
+  category        Category?         @relation(fields: [categoryId], references: [id])
+  categoryId      Int
   warehouse       Warehouse         @relation(fields: [warehouseId], references: [id])
   deletedAt       DateTime?
   TransactionItem TransactionItem[]
@@ -26,7 +26,7 @@ model Product {
 model Category {
   id        Int       @id @default(autoincrement())
   name      String    @db.VarChar(255)
-  product   Product?  @relation("ProductCategory")
+  product   Product[]
   deletedAt DateTime?
 }
 
