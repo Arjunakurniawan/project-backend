@@ -87,7 +87,7 @@ export const products = [
     price: 465000,
     stock: 70,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
   {
     id: 9,
@@ -97,7 +97,7 @@ export const products = [
     price: 340000,
     stock: 55,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
   {
     id: 10,
@@ -107,7 +107,7 @@ export const products = [
     price: 2340000,
     stock: 65,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
   {
     id: 11,
@@ -117,7 +117,7 @@ export const products = [
     price: 7647000,
     stock: 150,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
   {
     id: 12,
@@ -127,7 +127,7 @@ export const products = [
     price: 879000,
     stock: 35,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
   {
     id: 13,
@@ -137,7 +137,7 @@ export const products = [
     price: 867800,
     stock: 22,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
   {
     id: 14,
@@ -147,7 +147,7 @@ export const products = [
     price: 457800,
     stock: 10,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
   {
     id: 15,
@@ -157,7 +157,7 @@ export const products = [
     price: 1398000,
     stock: 200,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
   {
     id: 16,
@@ -167,7 +167,7 @@ export const products = [
     price: 236500,
     stock: 30,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
   {
     id: 17,
@@ -177,7 +177,7 @@ export const products = [
     price: 4758900,
     stock: 75,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
   {
     id: 18,
@@ -187,7 +187,7 @@ export const products = [
     price: 1346700,
     stock: 95,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
   {
     id: 20,
@@ -197,6 +197,6 @@ export const products = [
     price: 758600,
     stock: 50,
     warehouseId: 2,
-    categoryId: 1,
+    categoryId: 84,
   },
 ];

@@ -3,17 +3,10 @@ import { products } from "./data/products";
 
 const prisma = new PrismaClient();
 
-const categories = await prisma.category.findMany();
-const warehouses = await prisma.warehouse.findMany();
-
 async function main() {
   console.log("start seeding....");
 
   for (const product of products) {
-    const matchedCategory = categories.find((c) => c.name === product.name);
-    const matchedWarehouse = warehouses.find((w) => w.name === product.name);
-
-    if (!matchedCategory || !matchedWarehouse) continue;
     const createProductData = await prisma.product.upsert({
       where: { id: product.id },
 
@@ -23,8 +16,8 @@ async function main() {
         image: product.image,
         price: product.price,
         stock: product.stock,
-        categoryId: matchedCategory.id,
-        warehouseId: matchedWarehouse.id,
+        categoryId: product.categoryId,
+        warehouseId: product.warehouseId,
       },
 
       update: {
@@ -33,8 +26,8 @@ async function main() {
         image: product.image,
         price: product.price,
         stock: product.stock,
-        categoryId: matchedCategory.id,
-        warehouseId: matchedWarehouse.id,
+        categoryId: product.categoryId,
+        warehouseId: product.warehouseId,
       },
     });
     console.log("seeding is completed", createProductData);
