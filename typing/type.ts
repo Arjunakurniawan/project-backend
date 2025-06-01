@@ -83,4 +83,9 @@ export type ApiResponse<T> = {
   data: T;
   message: string | null;
   total: number | null;
+  pagination?: {
+    page: number | null;
+    limit: number | null;
+    total: number | null;
+  };
 };

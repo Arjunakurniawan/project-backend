@@ -38,14 +38,34 @@ app.get<string, null, ApiResponse<Product[]>>("/product", async (req, res) => {
           warehouse: true,
         },
       })) || [];
-    const total = await prisma.product.count();
-    res.status(200).json({ data: products, message: "success", total });
+    const total = await prisma.product.count({
+      where: {
+        deletedAt: null,
+      },
+    });
+    res.status(200).json({
+      data: products,
+      message: "success",
+      total,
+      pagination: {
+        page,
+        limit,
+        total,
+      },
+    });
     console.log("success get all products");
   } catch (error) {
     console.error(error);
-    res
-      .status(500)
-      .json({ data: [], message: "Error Get Products", total: null });
+    res.status(500).json({
+      data: [],
+      message: "Error Get Products",
+      total: null,
+      pagination: {
+        page: null,
+        limit: null,
+        total: null,
+      },
+    });
   }
 });
 
@@ -82,6 +102,7 @@ app.post<string, null, ApiResponse<null>, ProductRequest>(
       await prisma.product.create({
         data: req.body,
       });
+
       const total = await prisma.product.count();
       res
         .status(201)
@@ -96,7 +117,7 @@ app.post<string, null, ApiResponse<null>, ProductRequest>(
 );
 
 app.put<string, { id: string }, ApiResponse<null>, ProductRequest>(
-  "/product/:id",
+  "/product/edit/:id",
   async (req, res) => {
     try {
       await prisma.product.update({
@@ -314,7 +335,7 @@ app.put<string, { id: string }, ApiResponse<null>>(
 
 //CRUD Transaction
 app.get<string, null, ApiResponse<Transaction[]>>(
-  "/transaction",
+  "/transactions",
   async (_, res) => {
     try {
       const transactions = await prisma.transaction.findMany({
@@ -411,7 +432,7 @@ app.delete("/transaction/:id", async (req: Request, res: Response) => {
 });
 
 app.put<string, { id: string }, ApiResponse<null>, TransactionRequest>(
-  "/transaction/:id",
+  "/transaction/edit/:id",
   async (req, res) => {
     try {
       await prisma.transaction.update({
